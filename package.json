@@ -1,0 +1,26 @@
+{
+  "name": "@ublitzjs/openapi",
+  "version": "0.0.1",
+  "dependencies": {
+    "openapi3-ts": "^4.4.0",
+    "@ublitzjs/core": "^0.0.1",
+    "@ublitzjs/static": "^0.0.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    "types": "./index.d.ts",
+    "import": "./index.mjs",
+    "require": "./index.cjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ublitzjs/openapi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ublitzjs/openapi/issues",
+    "email": "diril656@gmail.com"
+  },
+  "homepage": "https://github.com/ublitzjs/openapi#readme"
+}
