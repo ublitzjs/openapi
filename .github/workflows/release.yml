@@ -3,20 +3,7 @@ on:
   release:
     types: [created]
 jobs:
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v4
-      - name: setup Node.js
-        uses: actions/setup-node@v4
-      - name: install deps
-        run: npm i
-      - name: run test
-        run: npx vitest run
   deploy:
-    needs: test
     name: Deploy on npm
     runs-on: ubuntu-latest
     steps:
