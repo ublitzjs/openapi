@@ -73,6 +73,10 @@ interface PathItemObject extends ISpecificationExtension {
   servers?: ServerObject[];
   parameters?: (ParameterObject | ReferenceObject)[];
 }
+/**
+ * use it with "extPaths" type from @ublitzjs/router" or with 'server.route' from 'core' package
+ * @see examples on github
+ */
 export type routeAddOns = {
   openapi?: {
     $ref?: string;
@@ -82,8 +86,15 @@ export type routeAddOns = {
     parameters?: (ParameterObject | ReferenceObject)[];
   };
 };
+/**
+ * use it with "extPaths" type from @ublitzjs/router" or with 'server.route' from 'core' package
+ * @see examples on github
+ */
 export type methodAddOns = { openapi?: Partial<OperationObject> };
-
+/**
+ * function, which should be put into "extendApp"
+ * @see https://github.com/ublitzjs/openapi/blob/main/examples/index.ts
+ */
 export function serverExtension(opts: OpenAPIObject): {
   openApiBuilder: OpenApiBuilder;
   /**
@@ -93,9 +104,9 @@ export function serverExtension(opts: OpenAPIObject): {
   serveOpenApi(
     prefix: string,
     opts?: {
-      build: boolean;
-      path: string;
-      clearMimes: boolean;
+      build?: boolean;
+      path?: string;
+      clearMimes?: boolean;
       uiPath?: string;
     }
   ): Promise<void>;
@@ -103,10 +114,12 @@ export function serverExtension(opts: OpenAPIObject): {
 };
 /**
  * This function goes to ExtendedRouter from @ublitzjs/router. registers all methods to openapi
+ * @see https://github.com/ublitzjs/openapi/blob/main/examples/router.cjs
  */
 export function RouterPlugin(path: string, methods: string[]): void;
 /**
  * this function goes to Server.route function from 'core' package. It lets you register all methods to openapi
+ * @see https://github.com/ublitzjs/openapi/blob/main/examples/index.ts
  */
 export function routePlugin<method extends HttpMethods>(
   route: routeFNOpts<method> & methodAddOns,

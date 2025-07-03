@@ -1,7 +1,11 @@
-var { DeclarativeResponse } = require("@ublitzjs/core");
-var { ExtendedRouter } = require("@ublitzjs/router");
-var { RouterPlugin: openapiRouterPlugin } = require("@ublitzjs/openapi");
-var { Type } = require("@sinclair/typebox");
+import { DeclarativeResponse } from "@ublitzjs/core";
+import { ExtendedRouter, type extPaths } from "@ublitzjs/router";
+import {
+  RouterPlugin as openapiRouterPlugin,
+  type methodAddOns,
+  type routeAddOns,
+} from "@ublitzjs/openapi";
+import type { currentServer } from ".";
 var router = new ExtendedRouter(
   {
     "/findByStatus/MultipleExamples": {
@@ -328,14 +332,11 @@ var router = new ExtendedRouter(
         controller: new DeclarativeResponse().end("JI"),
       },
     },
-  },
+  } satisfies extPaths<methodAddOns, routeAddOns>,
   [openapiRouterPlugin]
 );
-/**
- * using jsdoc in CJS
- * @param {import("./index.ts").currentServer} server
- */
-module.exports = (server) => {
+
+export default (server: currentServer) => {
   router
     .bind(server)
     .prefix("/pet")

@@ -4,29 +4,27 @@ import {
   registerAbort,
   seeOtherMethods,
 } from "@ublitzjs/core";
-import {
-  analyzeFolder,
-  basicSendFile,
-  sendFile,
-  staticServe,
-} from "@ublitzjs/static";
+import { basicSendFile, sendFile } from "@ublitzjs/static";
+import { staticServe, analyzeFolder } from "@ublitzjs/static/serving";
 import { exit } from "node:process";
 import { createWriteStream, write } from "node:fs";
 import path from "node:path";
+import { stat } from "node:fs/promises";
 var serverExtension = (opts) => ({
   openApiBuilder: new OpenApiBuilder(opts),
-  async serveOpenApi(prefix, opts) {
+  async serveOpenApi(prefix, opts = {}) {
     var specController;
-    if (opts) {
+    if (opts.path) {
       var length;
       if (opts.build) length = await this.buildOpenApi(opts.path, false);
+      else length = (await stat(opts.path)).size;
       specController = async (res) => {
         registerAbort(res);
         await sendFile({
           res,
           path: opts.path,
           contentType: "application/json",
-          totalSize: length || Infinity,
+          maxSize: length,
         });
       };
     } else {
@@ -36,8 +34,10 @@ var serverExtension = (opts) => ({
         .writeHeaders({ "Content-Type": "application/json" })
         .end(spec);
     }
-    var HERE = opts?.uiPath || "node_modules/@ublitzjs/openapi/ui";
-    var paths = await analyzeFolder(HERE, opts?.clearMimes);
+    var HERE = opts.uiPath || "node_modules/@ublitzjs/openapi/ui";
+    var paths = await analyzeFolder(HERE, {
+      deleteMimesList: opts?.clearMimes,
+    });
     const methods = staticServe({
       paths,
       fullRoute: prefix,
@@ -82,7 +82,7 @@ function RouterPlugin(methods) {
   var openApiPath = route?.openapi || {};
   delete route?.openapi;
   for (const method of methods) {
-    if (method === "connect") continue;
+    if (method === "connect" || method === "ws") continue;
     openApiPath[method === "del" ? "delete" : method] = route[method].openapi;
     delete route[method].openapi;
   }
@@ -92,7 +92,8 @@ function RouterPlugin(methods) {
   );
 }
 function routePlugin(route, server) {
-  if (route.method === "connect") return;
+  if (route.method === "connect" || route.method === "ws")
+    throw new Error("these methods can't be documented with openapi");
   var methodOpenapi = route.openapi || {};
   delete route.openapi;
   server.openApiBuilder.addPath(toOpenapiPath(route.path), {

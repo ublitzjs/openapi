@@ -2,15 +2,15 @@ import { App } from "uWebSockets.js";
 import { closure, extendApp, toAB, type onlyHttpMethods } from "@ublitzjs/core";
 import { logger } from "@ublitzjs/logger";
 import {
-  serverExtension as openapiPlugin,
+  serverExtension as openapiExtension,
   routePlugin,
   type methodAddOns,
 } from "@ublitzjs/openapi";
-import router from "./router.cjs";
+import router from "./router.ts";
 const server = extendApp(
   App(),
   // used template here
-  openapiPlugin({
+  openapiExtension({
     openapi: "3.0.2",
     info: {
       description:
