@@ -116,7 +116,7 @@ export function serverExtension(opts: OpenAPIObject): {
  * This function goes to ExtendedRouter from @ublitzjs/router. registers all methods to openapi
  * @see https://github.com/ublitzjs/openapi/blob/main/examples/router.cjs
  */
-export function RouterPlugin(path: string, methods: string[]): void;
+export function RouterPlugin(methods: string[]): void;
 /**
  * this function goes to Server.route function from 'core' package. It lets you register all methods to openapi
  * @see https://github.com/ublitzjs/openapi/blob/main/examples/index.ts
