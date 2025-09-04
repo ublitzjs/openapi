@@ -96,21 +96,34 @@ export type methodAddOns = { openapi?: Partial<OperationObject> };
  * @see https://github.com/ublitzjs/openapi/blob/main/examples/index.ts
  */
 export function serverExtension(opts: OpenAPIObject): {
-  openApiBuilder: OpenApiBuilder;
-  /**
-   * @param prefix url on which openapi will be served. You should note that an access to html page is kinda tricky: if prefix = "/docs", then you can't access http://localhost:port/docs BUT can access http://localhost:port/docs/ with the last slash. Or, if you want, just use http://localhost:port/docs/index.html - definitely works. Such a peculiarity of uWS wildcards.
-   * @param opts use if don't need to dynamically take openapi from code. Properties: build (whether to build an openapi and to serve after this), path (to an openapi json file), clearMimes (same as in 'static' package "clearMimesList"), uiPath - path to folder with ui (defaults to node_modules/@ublitzjs/openapi/ui)
-   */
-  serveOpenApi(
-    prefix: string,
-    opts?: {
-      build?: boolean;
-      path?: string;
-      clearMimes?: boolean;
-      uiPath?: string;
-    }
-  ): Promise<void>;
-  buildOpenApi(filePath: string, exitFromNodejs: boolean): Promise<number>;
+  openapi: {
+    /**
+    * Builder from "openapi3-ts" npm package. You can use it to dynamically insert paths, components, etc.
+    * */
+    builder: OpenApiBuilder;
+    /**
+     * @param prefix prefix for openapi UI to be served at. 
+     * @param opts : build (if to save open api to some file and serve it after this), path (to an openapi json file), clearMimes (same as in 'static' package "clearMimesList"), uiPath - path to folder with ui (defaults to node_modules/@ublitzjs/openapi/ui)
+     */
+    serve(
+      /**
+      * url on which openapi will be served. openapi.json is served on http://hostname:port/PREFIX/openapi.json. Main page - http://hostname:port/PREFIX/  AND It ENDS with slash (uWS's quirk, not mine)  OR http://hostname:port/PREFIX/index.html
+      * */
+      prefix: string,
+      opts?: {
+        build?: boolean;
+        path?: string;
+        clearMimes?: boolean;
+        uiPath?: string;
+      }
+    ): Promise<void>;
+    /**
+    * build openapi.json file in specified filePath AND if needed - exit afterwards.
+    * @returns File size
+    * */
+    build(filePath: string, exitFromNodejs: boolean): Promise<number>;
+
+  }
 };
 /**
  * This function goes to ExtendedRouter from @ublitzjs/router. registers all methods to openapi
@@ -124,6 +137,8 @@ export function RouterPlugin(methods: string[]): void;
 export function routePlugin<method extends HttpMethods>(
   route: routeFNOpts<method> & methodAddOns,
   server: Server & {
-    openApiBuilder: OpenApiBuilder;
+    openapi: {
+      builder: OpenApiBuilder;
+    }
   }
 ): void;

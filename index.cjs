@@ -2,17 +2,16 @@ var { OpenApiBuilder } = require("openapi3-ts/oas31"),
   {
     DeclarativeResponse,
     registerAbort,
-    seeOtherMethods,
   } = require("@ublitzjs/core"),
-  { basicSendFile, sendFile } = require("@ublitzjs/static"),
+  { sendFile } = require("@ublitzjs/static"),
   { staticServe, analyzeFolder } = require("@ublitzjs/static/serving"),
   { exit } = require("node:process"),
-  { createWriteStream, write } = require("node:fs"),
-  path = require("node:path"),
-  { stat } = require("node:fs/promises"),
-  serverExtension = (opts) => ({
-    openApiBuilder: new OpenApiBuilder(opts),
-    async serveOpenApi(prefix, opts = {}) {
+  { createWriteStream } = require("node:fs"),
+  { stat } = require("node:fs/promises");
+var serverExtension = (opts) => ({
+  openapi: {
+    builder: new OpenApiBuilder(opts),
+    async serve(prefix, opts = {}) {
       var specController;
       if (opts.path) {
         var length;
@@ -57,8 +56,8 @@ var { OpenApiBuilder } = require("openapi3-ts/oas31"),
             )
         );
     },
-    async buildOpenApi(filePath, exitFromNodejs) {
-      var spec = this.openApiBuilder.getSpecAsJson();
+    async build(filePath, exitFromNodejs) {
+      var spec = this.builder.getSpecAsJson();
       delete this.openApiBuilder;
       var writeStream = createWriteStream(filePath);
       var offset = 0;
@@ -68,6 +67,7 @@ var { OpenApiBuilder } = require("openapi3-ts/oas31"),
         if (!ok)
           await new Promise((resolve) => writeStream.once("drain", resolve));
       }
+
       return new Promise((resolve) => {
         writeStream.end(() => {
           if (exitFromNodejs) exit(0);
@@ -75,8 +75,9 @@ var { OpenApiBuilder } = require("openapi3-ts/oas31"),
         });
       });
     },
-  }),
-  toOpenapiPath = (v) => v.replace(/:([a-zA-Z0-9_]+)/g, "{$1}");
+  },
+});
+var toOpenapiPath = (v) => v.replace(/:([a-zA-Z0-9_]+)/g, "{$1}");
 function RouterPlugin(methods) {
   var route = this.paths[this._currentPath];
   var openApiPath = route?.openapi || {};
