@@ -97,7 +97,7 @@ function routePlugin(route, server) {
     throw new Error("these methods can't be documented with openapi");
   var methodOpenapi = route.openapi || {};
   delete route.openapi;
-  server.openApiBuilder.addPath(toOpenapiPath(route.path), {
+  server.openapi.builder.addPath(toOpenapiPath(route.path), {
     [route.method]: methodOpenapi,
   });
 }
