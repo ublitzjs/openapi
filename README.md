@@ -35,11 +35,11 @@ var server = extendApp(
 var BUILD_OPENAPI_TO_JSON = false as boolean;
 
 if (BUILD_OPENAPI_TO_JSON === true)
-  server.openapi.build(
+  server.buildOpenApi(
     /*path*/ "openapi.json",
     /*exit from node.js (better for performance, if app will be compiled afterwards without these schemas)*/ true
   );
-await server.openapi.serve(
+await server.serveOpenApi(
   /*url (but it is fully working ONLY by http://localhost:port/docs/ with last slash, sorry)*/ "/docs",
   {
     // whether to use buildOpenApi before starting server. Mostly useless. But if development - ok
