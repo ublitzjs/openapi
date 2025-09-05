@@ -87,7 +87,7 @@ function RouterPlugin(methods) {
     openApiPath[method === "del" ? "delete" : method] = route[method].openapi;
     delete route[method].openapi;
   }
-  this.server.openApiBuilder.addPath(
+  this.server.openapi.builder.addPath(
     toOpenapiPath(this.prefixedPath),
     openApiPath
   );
