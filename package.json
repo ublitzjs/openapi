@@ -2,9 +2,10 @@
   "name": "@ublitzjs/openapi",
   "version": "0.0.3",
   "dependencies": {
+    "@ublitzjs/core": "^0.1.0",
+    "@ublitzjs/static": "~0.1.0",
     "openapi3-ts": "^4.4.0",
-    "@ublitzjs/core": "~0.0.1",
-    "@ublitzjs/static": "~0.1.0"
+    "vitest": "^3.2.4"
   },
   "publishConfig": {
     "access": "public"
@@ -30,5 +31,13 @@
     "docs",
     "typescript-first",
     "development"
-  ]
+  ],
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "@ublitzjs/preprocess": "github:ublitzjs/preprocess#v0.0.3",
+    "@ublitzjs/router": "^0.1.0",
+    "esbuild": "^0.25.9",
+    "tsx": "^4.20.5",
+    "undici": "^7.15.0"
+  }
 }
