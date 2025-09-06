@@ -1,4 +1,5 @@
 package-lock.json
+openapi.json
 out
 node_modules
 bun.*

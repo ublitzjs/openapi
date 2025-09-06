@@ -3,7 +3,16 @@ import {request} from "undici";
 import {exec} from "node:child_process";
 import {build} from "esbuild";
 var bundledFile = (format:"esm"|"cjs") => "tests/" + format + "/out/test-bundle" + (format == "esm" ? ".mjs" : ".cjs");
-async function bundle(format: "esm"|"cjs"){
+async function buildExample(format: "esm"|"cjs"){
+  await new Promise((resolve, reject) =>{
+    exec(
+      "BUILD_DOCS=true npx tsx tests/" + format + "/src/index" + (format == "esm" ? ".mts" : ".cts"),
+      (err)=>{
+        if(err) reject(err)
+        resolve(null);
+      }
+    )
+  })
   await new Promise((resolve, reject) => {
     exec(
       "npx preprocess \"--default-s=/*REMOVE*/\" \"--default-e=/*!REMOVE*/\" --dirs: \"<tests/" + format + "/src|tests/" + format + "/out>\"", 
@@ -37,14 +46,14 @@ async function bundle(format: "esm"|"cjs"){
     ignoreAnnotations: false,
     resolveExtensions: [".mts", ".ts", ".js", ".mjs", ".cts", ".cjs"],
     outfile: bundledFile(format),
-    entryPoints: ["tests/" + format + "/out/index.ts"]
+    entryPoints: ["tests/" + format + "/out/index" + (format == "esm" ? ".mts" : ".cts")]
   });
 };
-function suite(serverExports: any){
-  serverExports.start();
+async function suite(serverExports: any, format: "esm" | "cjs"){
+  await serverExports.start();
   afterAll(serverExports.end);
   
-  describe("works", ()=>{
+  describe(format, ()=>{
     it("hello", async ()=>{
       await request("http://localhost:" + serverExports.port).then(res=>{
         expect(res.statusCode).toBe(404);
@@ -53,11 +62,15 @@ function suite(serverExports: any){
   });
 }
 
-describe("Openapi example", {concurrent: false, sequential: true}, async ()=>{
-  it("bundles", async ()=> await Promise.all([ bundle("esm"), bundle("cjs") ]));
-  it("starts", async () => await Promise.all([import(bundledFile("esm")), import(bundledFile("cjs"))]).then((results) => {
-    suite(results[0]), suite(results[1])
-  }))
+describe("Openapi example", {concurrent: true, sequential: false}, async ()=>{
+  await Promise.all([ buildExample("esm"), buildExample("cjs") ])
+  var results = await Promise.all([ import(bundledFile("esm")), import(bundledFile("cjs"))])
+
+  await Promise.all([
+    suite(results[1], "cjs"),
+    suite(results[0], "esm")
+  ])
+ 
 });
 
 
