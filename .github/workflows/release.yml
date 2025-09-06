@@ -1,10 +1,23 @@
-name: Test
+name: Release
 on:
   release:
     types: [created]
 jobs:
+  run-test:
+    name: Just tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+      - name: Install deps
+        run: npm i 
+      - name: run test
+        run: npx vitest run
   deploy:
     name: Deploy on npm
+    needs: run-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
