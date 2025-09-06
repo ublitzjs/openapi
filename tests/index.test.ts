@@ -2,6 +2,8 @@ import {afterAll, describe, it, expect} from "vitest";
 import {request} from "undici";
 import {exec} from "node:child_process";
 import {build} from "esbuild";
+import puppeteer from "puppeteer";
+import {setTimeout} from "node:timers/promises";
 var bundledFile = (format:"esm"|"cjs") => "tests/" + format + "/out/test-bundle" + (format == "esm" ? ".mjs" : ".cjs");
 async function buildExample(format: "esm"|"cjs"){
   await new Promise((resolve, reject) =>{
@@ -52,12 +54,18 @@ async function buildExample(format: "esm"|"cjs"){
 async function suite(serverExports: any, format: "esm" | "cjs"){
   await serverExports.start();
   afterAll(serverExports.end);
-  
   describe(format, ()=>{
-    it("hello", async ()=>{
-      await request("http://localhost:" + serverExports.port).then(res=>{
-        expect(res.statusCode).toBe(404);
+    it("actually has all ui fetched for openapi", async ()=>{
+      var browser = await puppeteer.launch();
+      var page = await browser.newPage();
+      page.on("pageerror", err => {
+        console.log(`Page error: ${err.toString()}`);
+        throw err;
+      });
+      await page.goto("http://localhost:" + serverExports.port + "/docs/", {
+        waitUntil: "networkidle0"
       })
+      await browser.close();
     })
   });
 }
