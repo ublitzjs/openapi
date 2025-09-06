@@ -1,9 +1,8 @@
-import {afterAll, describe, it, expect} from "vitest";
+import {afterAll, describe, it } from "vitest";
 import {request} from "undici";
 import {exec} from "node:child_process";
 import {build} from "esbuild";
 import puppeteer from "puppeteer";
-import {setTimeout} from "node:timers/promises";
 var bundledFile = (format:"esm"|"cjs") => "tests/" + format + "/out/test-bundle" + (format == "esm" ? ".mjs" : ".cjs");
 async function buildExample(format: "esm"|"cjs"){
   await new Promise((resolve, reject) =>{
@@ -56,7 +55,13 @@ async function suite(serverExports: any, format: "esm" | "cjs"){
   afterAll(serverExports.end);
   describe(format, ()=>{
     it("actually has all ui fetched for openapi", async ()=>{
-      var browser = await puppeteer.launch();
+      var browser = await puppeteer.launch({
+        headless:true,
+        args: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox"
+        ]
+      });
       var page = await browser.newPage();
       page.on("pageerror", err => {
         console.log(`Page error: ${err.toString()}`);
