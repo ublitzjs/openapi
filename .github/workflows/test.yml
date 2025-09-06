@@ -1,0 +1,8 @@
+name: Tests
+on: push
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+      - run: npm i && npx vitest run
