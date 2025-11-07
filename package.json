@@ -1,10 +1,10 @@
 {
   "name": "@ublitzjs/openapi",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "dependencies": {
-    "openapi3-ts": "^4.4.0",
-    "@ublitzjs/core": "~0.0.1",
-    "@ublitzjs/static": "~0.1.0"
+    "@ublitzjs/core": "^0.1.1",
+    "@ublitzjs/static": "^0.2.1",
+    "openapi3-ts": "^4.4.0"
   },
   "publishConfig": {
     "access": "public"
@@ -30,5 +30,9 @@
     "docs",
     "typescript-first",
     "development"
-  ]
+  ],
+  "devDependencies": {
+    "@ublitzjs/logger": "^0.0.2",
+    "@ublitzjs/router": "^0.1.0"
+  }
 }
